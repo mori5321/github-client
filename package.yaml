@@ -29,6 +29,7 @@ dependencies:
 - http-client-tls
 - mtl
 - text
+- ghc-prim
 
 library:
   source-dirs: src

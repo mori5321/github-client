@@ -1,24 +1,38 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 
 module GitHub.Request 
-    ( Request(..)
-    , execRequest
-    , getResponseBody
+    ( IsRequest(..)
     , Method(..)
+    , Request(..)
     , Path
+    , getResponseBody
+    , getResponseStatusCode
+    , sendRequest
+    , mkHttpRequestDefault
+    , withAuth
+    , withBody
     )
 where
 
-import Data.Aeson (Value, FromJSON, ToJSON)
+import GHC.Generics
+import Data.Aeson ( Value, FromJSON, ToJSON )
+import qualified Data.Aeson as Aeson
+import Data.Kind (Type)
 import qualified Data.Yaml as Yaml
 import qualified Data.ByteString.Char8 as S8
-
-import Control.Monad.IO.Class (MonadIO)
+import Control.Monad.IO.Class ( MonadIO )
 import Control.Applicative (pure)
-
 import Network.HTTP.Simple ( setRequestPath
                            , setRequestHost
                            , setRequestHeader
+                           , setRequestBodyJSON
                            , setRequestMethod
                            , setRequestPort
                            , setRequestSecure
@@ -33,44 +47,61 @@ import Network.HTTP.Simple ( setRequestPath
                            )
 import qualified Network.HTTP.Simple as HTTP
 
-import GitHub.Auth (setRequestAuth, Auth(..))
-
+import GitHub.Auth ( setRequestAuth, Auth(..) )
 
 data Method = GET | POST | PATCH | DELETE deriving Show
-
 type Path = S8.ByteString
--- data Request = Request { path :: Path
---                        , method :: Method
---                        }
+data Request = Request { reqPath :: Path
+                       , reqMethod :: Method
+                       } deriving (Show, Generic)
 
+class IsRequest request where
+    path :: request -> Path
+    method :: request -> Method
+    mkHttpRequest :: request -> HTTP.Request
+    mkHttpRequest = mkHttpRequestDefault
 
-data Request = Request { path :: Path, method :: Method}
+instance IsRequest Request where
+    path = reqPath
+    method = reqMethod
     
+withAuth :: Auth -> HTTP.Request -> HTTP.Request
+withAuth = setRequestAuth
 
--- TODO
--- クラスをつくる
--- Response Valueとして使えるクラス
--- = FromJSON, ToJSONできて
--- = Show できるやつ
+withBody :: ToJSON b => b -> HTTP.Request -> HTTP.Request
+withBody = setRequestBodyJSON
 
-execRequest :: (FromJSON r) => Request -> Auth -> IO (HTTP.Response r)
-execRequest auth = sendRequest . mkHttpRequest auth
-
-
-mkHttpRequest :: Request -> Auth -> HTTP.Request
-mkHttpRequest req auth = 
+mkHttpRequestDefault :: IsRequest r => r -> HTTP.Request
+mkHttpRequestDefault req = 
     setRequestPath (path req)
-    $ setRequestMethod (S8.pack . show $ method req)
-    $ setRequestHeader "Content-Type" ["application/json"]
-    $ setRequestAuth auth
-    $ setRequestHeader "User-Agent" ["Github-API-Client"]
-    $ setRequestPort 443
-    $ setRequestSecure True 
-    $ setRequestHost "api.github.com"
-    $ defaultRequest
+        $ setRequestMethod (S8.pack . show $ method req)
+        $ setDefaultHeaders
+        $ setDefaultConfigs
+        $ defaultRequest
 
--- TODO: あとでいい感じな型定義にしたい
--- sendRequest :: (FromJSON b, MonadIO m) => Request -> m (Response b)
--- sendRequest :: (FromJSON b, Show b) => Request -> IO (Response b)
+-- execRequest :: (FromJSON b) => HTTP.Request -> IO b
+-- execRequest req = getResponseBody <$> sendRequest req
+
+-- execRequest :: (IsRequest req, ToJSON reqBody, FromJSON resBody) => req -> reqBody -> Auth -> IO (HTTP.Response resBody)
+-- execRequest req body auth = sendRequest (mkHttpRequest req body auth)
+
+-- execRequest :: (IsRequest req, ToJSON reqBody, FromJSON resBody) => req -> reqBody -> Auth -> IO (HTTP.Response)
+-- execRequest req body auth = do
+--     response <- sendRequest (mkHttpRequest req body auth)
+--     let body = getResponseBody response
+--     return body
+
+
+setDefaultHeaders :: HTTP.Request -> HTTP.Request
+setDefaultHeaders = 
+    setRequestHeader "Content-Type" ["application/json"]
+    . setRequestHeader "User-Agent" ["Github-API-Client"]
+
+setDefaultConfigs :: HTTP.Request -> HTTP.Request
+setDefaultConfigs =
+    setRequestPort 443
+    . setRequestSecure True 
+    . setRequestHost "api.github.com"
+
 sendRequest :: (FromJSON r) => HTTP.Request -> IO (HTTP.Response r)
 sendRequest = httpJSON
