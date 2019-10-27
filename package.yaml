@@ -23,6 +23,7 @@ dependencies:
 - base >= 4.7 && < 5
 - http-conduit
 - http-client
+- http-types
 - bytestring
 - aeson
 - yaml
@@ -32,9 +33,15 @@ dependencies:
 - ghc-prim
 - time
 - iso8601-time
+- containers
+
+
+
 
 library:
   source-dirs: src
+  default-extensions:
+  - OverloadedStrings
 
 executables:
   github-client-exe:

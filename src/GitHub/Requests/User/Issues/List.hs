@@ -18,6 +18,7 @@ import GitHub.Request ( Request(..)
                       , Method(..)
                       , getResponseBody
                       , sendRequest
+                      , sendRequest'
                       , getResponseStatusCode
                       , mkHttpRequest
                       , withAuth
@@ -40,8 +41,12 @@ listUserIssuesHttpRequest queryItems auth = withAuth auth
     req = mkRequest
     query = map toHTTPQueryItem queryItems
 
-listUserIssues :: [QueryItem] -> Auth -> IO [Issue]
-listUserIssues queryItems auth =
-    getResponseBody <$> sendRequest httpReq
+
+listUserIssues :: [QueryItem] -> Auth -> IO (Either Int [Issue])
+listUserIssues queryItems auth = do
+    res <- getResponseBody <$> sendRequest' httpReq
+    case res of
+      Right a -> return $ Right a
+      Left (HTTP.JSONConversionException a b c) -> return $ Left $ HTTP.getResponseStatusCode b
   where
     httpReq = listUserIssuesHttpRequest queryItems auth

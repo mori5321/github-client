@@ -16,6 +16,7 @@ module GitHub.Request
     , getResponseBody
     , getResponseStatusCode
     , sendRequest
+    , sendRequest'
     , mkHttpRequestDefault
     , withAuth
     , withQuery
@@ -25,12 +26,7 @@ where
 
 import GHC.Generics
 import Data.Aeson ( Value, FromJSON, ToJSON )
-import qualified Data.Aeson as Aeson
-import Data.Kind (Type)
-import qualified Data.Yaml as Yaml
 import qualified Data.ByteString.Char8 as S8
-import Control.Monad.IO.Class ( MonadIO )
-import Control.Applicative (pure)
 import Network.HTTP.Simple ( setRequestPath
                            , setRequestHost
                            , setRequestHeader
@@ -42,8 +38,8 @@ import Network.HTTP.Simple ( setRequestPath
                            , setRequestQueryString
                            , defaultRequest
                            , httpJSON
-                           , httpLBS
                            , httpJSONEither
+                           , JSONException
                            , getResponseStatusCode
                            , getResponseHeader
                            , getResponseBody
@@ -116,3 +112,6 @@ setDefaultConfigs =
 
 sendRequest :: (FromJSON r) => HTTP.Request -> IO (HTTP.Response r)
 sendRequest = httpJSON
+
+sendRequest' :: (FromJSON r) => HTTP.Request -> IO (HTTP.Response (Either JSONException r))
+sendRequest' = httpJSONEither
