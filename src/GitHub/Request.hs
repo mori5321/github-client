@@ -9,7 +9,7 @@
 
 module GitHub.Request 
     ( IsRequest(..)
-    , IsQueryItem(..)
+    , IsHTTPQueryItem(..)
     , Method(..)
     , Request(..)
     , Path
@@ -60,8 +60,8 @@ data Request = Request { reqPath :: Path
                        , reqMethod :: Method
                        } deriving (Show, Generic)
 
-class IsQueryItem a where
-    toQueryItem :: a -> HTTP.QueryItem
+class IsHTTPQueryItem a where
+    toHTTPQueryItem :: a -> HTTP.QueryItem
 
 class IsRequest request where
     path :: request -> Path

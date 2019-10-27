@@ -14,13 +14,13 @@ import GHC.Generics
 import GitHub.Types.User ( User(..) )
 import GitHub.Types.Issue ( Issue(..)
                           , Filter
-                          , HeteroQueryItem
+                          , QueryItem
                           )
 import GitHub.Request ( IsRequest(..)
                       , Request(..)
                       , Method(..)
                       , Path
-                      , IsQueryItem(..)
+                      , IsHTTPQueryItem(..)
                       , getResponseBody
                       , sendRequest
                       , getResponseStatusCode
@@ -38,15 +38,15 @@ mkRequest = Request { reqPath =  mconcat ["user", "/issues"]
                     , reqMethod = GET
                     }
 
-listUserIssuesHttpRequest :: [HeteroQueryItem] -> Auth -> HTTP.Request
+listUserIssuesHttpRequest :: [QueryItem] -> Auth -> HTTP.Request
 listUserIssuesHttpRequest queryItems auth = withAuth auth
                                            . withQuery query
                                            . mkHttpRequest $ req
   where
     req = mkRequest
-    query = map toQueryItem queryItems
+    query = map toHTTPQueryItem queryItems
 
-listUserIssues :: [HeteroQueryItem] -> Auth -> IO [Issue]
+listUserIssues :: [QueryItem] -> Auth -> IO [Issue]
 listUserIssues queryItems auth =
     getResponseBody <$> sendRequest httpReq
   where
