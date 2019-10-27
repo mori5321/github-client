@@ -1,7 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module GitHub.Requests.User.List where
+module GitHub.Requests.User.List
+  (listUsers
+  )
+where
 
 import GHC.Generics
 import qualified Data.ByteString.Char8 as S8

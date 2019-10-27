@@ -1,7 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module GitHub.Requests.User.Fetch where
+module GitHub.Requests.User.Fetch
+  ( fetchUser
+  )
+where
 
 import GHC.Generics
 import qualified Data.ByteString.Char8 as S8
@@ -20,24 +23,24 @@ import GitHub.Request ( Request(..)
                       )
 import qualified Network.HTTP.Simple as HTTP
 import GitHub.Auth (Auth)
-import Data.Aeson (Value) 
-import GitHub.Error (Error, parseError)
+import Data.Aeson (Value, FromJSON, ToJSON) 
+import GitHub.Error (Error, parseBodyEither, getResponseBodyEither)
+
 
 type UserName = S8.ByteString
 
 mkRequest :: UserName -> Request
 mkRequest userName = Request ("/users/" <> userName) GET
 
-
-
-fetchUser :: UserName -> Auth -> IO (Either Error User)
-fetchUser name auth = do
-    body <- getResponseBody
-            <$> sendRequest' (withAuth auth . mkHttpRequest $ req)
-
-    case body of
-      Left error -> return $ Left $ parseError error
-      Right user -> return $ Right user
+fetchUserHttpRequest :: UserName -> Auth -> HTTP.Request
+fetchUserHttpRequest name auth = withAuth auth
+                                 . mkHttpRequest $ req
   where
     req = mkRequest name
 
+fetchUser :: UserName -> Auth -> IO (Either Error User)
+fetchUser name auth = do
+    -- parseBodyEither . getResponseBody <$> sendRequest' httpReq
+    getResponseBodyEither <$> sendRequest' httpReq
+  where
+    httpReq = fetchUserHttpRequest name auth

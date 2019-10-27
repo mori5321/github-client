@@ -3,7 +3,6 @@
 
 module GitHub.Requests.User.Issues.List
   ( listUserIssues
-  , listUserIssuesHttpRequest
   )
 where
 

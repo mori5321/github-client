@@ -3,7 +3,8 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
 module GitHub.Error
-    ( parseError
+    ( parseBodyEither
+    , getResponseBodyEither
     , Error(..)
     , Body(..)
     )
@@ -24,9 +25,15 @@ data Error = Error { statusCode :: Int
                    , responseBody :: Body
                    } deriving (Show, Generic, FromJSON, ToJSON)
 
-data Body = ErrorBody { message :: T.Text
+data Body = Body { message :: T.Text
                       } deriving (Show, Generic, FromJSON, ToJSON)
-                            
+
+getResponseBodyEither :: (FromJSON b) => HTTP.Response (Either HTTP.JSONException b) -> Either Error b
+getResponseBodyEither = parseBodyEither . HTTP.getResponseBody
+    
+parseBodyEither :: (FromJSON b) => (Either HTTP.JSONException b) -> (Either Error b)
+parseBodyEither (Left err) = Left $ parseError err
+parseBodyEither (Right body) = Right $ body
 
 parseError :: HTTP.JSONException -> Error
 parseError (JSONConversionException _ res _) =
