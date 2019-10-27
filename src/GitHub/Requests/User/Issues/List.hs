@@ -12,15 +12,12 @@ import qualified Data.ByteString.Char8 as S8
 import Data.Aeson ( Value, FromJSON, ToJSON )
 import GHC.Generics
 import GitHub.Types.User ( User(..) )
-import GitHub.Types.Issue ( Issue(..)
-                          , Filter
-                          , QueryItem
-                          )
+import GitHub.Types.Issue ( Issue(..) )
+import GitHub.Query ( toHTTPQueryItem, QueryItem )
 import GitHub.Request ( IsRequest(..)
                       , Request(..)
                       , Method(..)
                       , Path
-                      , IsHTTPQueryItem(..)
                       , getResponseBody
                       , sendRequest
                       , getResponseStatusCode

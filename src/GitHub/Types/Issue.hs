@@ -2,17 +2,15 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE ExistentialQuantification #-}
 
 module GitHub.Types.Issue
     ( Issue(..)
-    , Filter(..)
-    , State(..)
-    , Label(..)
-    , Sort(..)
-    , Direction(..)
-    , Since
-    , QueryItem(..)
+    , FilterQuery(..)
+    , StateQuery(..)
+    , LabelQuery(..)
+    , SortQuery(..)
+    , DirectionQuery(..)
+    , SinceQuery
     )
 where
 
@@ -24,50 +22,55 @@ import Data.List
 import Data.Time
 import Data.Time.ISO8601
 
-import GitHub.Request (  IsHTTPQueryItem(..) )
+import GitHub.Query ( IsHTTPQueryItem(..), QueryItem )
+import GitHub.Types.User ( User )
 
 
 data Issue = Issue { id :: Integer
+                   , url :: T.Text
+                   , title :: T.Text
+                   , body :: T.Text
+                   , created_at :: UTCTime
+                   , updated_at :: UTCTime
+                   , user :: User
+                   , assignees :: [User]
+                   , closed_at :: Maybe UTCTime
                    } deriving (Show, Generic, FromJSON, ToJSON)
 
-data Filter = Assigned | Created | Mentioned | Subscribed | All
-instance IsHTTPQueryItem Filter where
+data FilterQuery = Assigned | Created | Mentioned | Subscribed | All
+instance IsHTTPQueryItem FilterQuery where
     toHTTPQueryItem Assigned   = ("filter", Just "assigned")
     toHTTPQueryItem Created    = ("filter", Just "created")
     toHTTPQueryItem Mentioned  = ("filter", Just "mentioned")
     toHTTPQueryItem Subscribed = ("filter", Just "subscribed")
     toHTTPQueryItem All        = ("filter", Just "all")
 
-data State = Open | Closed | AllState
-instance IsHTTPQueryItem State where
+data StateQuery = Open | Closed | AllState
+instance IsHTTPQueryItem StateQuery where
     toHTTPQueryItem Open     = ("state", Just "open")
     toHTTPQueryItem Closed   = ("state", Just "closed")
     toHTTPQueryItem AllState = ("state", Just "all")
 
-newtype Label = Label S8.ByteString
-type Labels = [Label]
+newtype LabelQuery = LabelQuery S8.ByteString
+type LabelsQuery = [LabelQuery]
 
-unwrapLabel :: Label -> S8.ByteString
-unwrapLabel (Label bs) = bs
+unwrapLabelQuery :: LabelQuery -> S8.ByteString
+unwrapLabelQuery (LabelQuery bs) = bs
 
-instance IsHTTPQueryItem Labels where
-    toHTTPQueryItem labels = ("labels", Just $ S8.intercalate "," $ map unwrapLabel labels)
+instance IsHTTPQueryItem LabelsQuery where
+    toHTTPQueryItem labels = ("labels", Just $ S8.intercalate "," $ map unwrapLabelQuery labels)
 
-data Sort = SortByCreated | SortByUpdated | SortByComments
-instance IsHTTPQueryItem Sort where
+data SortQuery = SortByCreated | SortByUpdated | SortByComments
+instance IsHTTPQueryItem SortQuery where
     toHTTPQueryItem SortByCreated  = ("sort", Just "created")
     toHTTPQueryItem SortByUpdated  = ("sort", Just "updated")
     toHTTPQueryItem SortByComments = ("sort", Just "comments")
 
-data Direction = Desc | Asc
-instance IsHTTPQueryItem Direction where
+data DirectionQuery = Desc | Asc
+instance IsHTTPQueryItem DirectionQuery where
     toHTTPQueryItem Desc = ("direction", Just "desc")
     toHTTPQueryItem Asc = ("direction", Just "asc")
 
-type Since = UTCTime
-instance IsHTTPQueryItem Since where
+type SinceQuery = UTCTime
+instance IsHTTPQueryItem SinceQuery where
     toHTTPQueryItem since = ("since", Just $ S8.pack $ formatISO8601 since)
-
-data QueryItem = forall a . IsHTTPQueryItem a => QueryItem a
-instance IsHTTPQueryItem QueryItem where
-    toHTTPQueryItem (QueryItem qi) = toHTTPQueryItem qi
