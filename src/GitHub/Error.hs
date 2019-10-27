@@ -49,5 +49,4 @@ parseError (JSONConversionException _ res _) =
 -- where
 -- -- statusCode = getResponseStatusCode :: int
 -- error = fromJSON $ getResponseBody res
-
     

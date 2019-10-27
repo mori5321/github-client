@@ -16,29 +16,39 @@ import GitHub.Request ( Request(..)
                       , Method(..)
                       , getResponseBody
                       , sendRequest
+                      , sendRequest'
                       , getResponseStatusCode
                       , mkHttpRequest
                       , withAuth
                       , withBody
+                      , withQuery
                       )
 import GitHub.Auth ( Auth )
+import GitHub.Error (Error, parseBodyEither, getResponseBodyEither)
+import GitHub.Query ( toHTTPQueryItem, QueryItem )
 
 
 type Since = Integer
-mkRequest :: Since -> Request
-mkRequest since = Request path GET
+mkRequest :: Request
+mkRequest = Request path GET
   where
-    path = mconcat ["users", "?since=", sinceString]
-    sinceString = S8.pack $ show since
+    path = mconcat ["users"]
 
-listUsersHttpRequest :: Since -> HTTP.Request
-listUsersHttpRequest since = mkHttpRequest req
-  where
-    req = mkRequest since
+listUsersHttpRequest :: [QueryItem] -> HTTP.Request
+listUsersHttpRequest queryItems = withQuery query . mkHttpRequest $ req
+    where
+      req = mkRequest
+      query = map toHTTPQueryItem queryItems
 
-listUsers :: Since -> IO [User]
+
+-- listUsers :: Since -> IO [User]
+-- listUsers since =
+--     getResponseBody <$> sendRequest httpReq
+--   where
+--     httpReq = listUsersHttpRequest since
+    
+listUsers :: [QueryItem] -> IO (Either Error [User])
 listUsers since =
-    getResponseBody <$> sendRequest httpReq
+    getResponseBodyEither <$> sendRequest' httpReq
   where
     httpReq = listUsersHttpRequest since
-    
