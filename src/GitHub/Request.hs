@@ -9,6 +9,7 @@
 
 module GitHub.Request 
     ( IsRequest(..)
+    , IsQueryItem(..)
     , Method(..)
     , Request(..)
     , Path
@@ -17,6 +18,7 @@ module GitHub.Request
     , sendRequest
     , mkHttpRequestDefault
     , withAuth
+    , withQuery
     , withBody
     )
 where
@@ -37,6 +39,7 @@ import Network.HTTP.Simple ( setRequestPath
                            , setRequestPort
                            , setRequestSecure
                            , setRequestManager
+                           , setRequestQueryString
                            , defaultRequest
                            , httpJSON
                            , httpLBS
@@ -50,10 +53,15 @@ import qualified Network.HTTP.Simple as HTTP
 import GitHub.Auth ( setRequestAuth, Auth(..) )
 
 data Method = GET | POST | PATCH | DELETE deriving Show
+
 type Path = S8.ByteString
+
 data Request = Request { reqPath :: Path
                        , reqMethod :: Method
                        } deriving (Show, Generic)
+
+class IsQueryItem a where
+    toQueryItem :: a -> HTTP.QueryItem
 
 class IsRequest request where
     path :: request -> Path
@@ -70,6 +78,9 @@ withAuth = setRequestAuth
 
 withBody :: ToJSON b => b -> HTTP.Request -> HTTP.Request
 withBody = setRequestBodyJSON
+
+withQuery :: HTTP.Query -> HTTP.Request -> HTTP.Request
+withQuery = setRequestQueryString
 
 mkHttpRequestDefault :: IsRequest r => r -> HTTP.Request
 mkHttpRequestDefault req = 
