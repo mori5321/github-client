@@ -3,15 +3,13 @@
 
 module GitHub.Requests.User.Fetch where
 
-import Data.Text as T
-import qualified Data.ByteString.Char8 as S8
-import Data.Aeson ( Value, FromJSON, ToJSON )
 import GHC.Generics
+import qualified Data.ByteString.Char8 as S8
 import GitHub.Types.User ( User(..) )
-import GitHub.Request ( IsRequest(..)
-                      , Request(..)
+import GitHub.Request ( Request(..)
                       , Method(..)
                       , Path
+                      , mkHttpRequest
                       , getResponseBody
                       , sendRequest
                       , getResponseStatusCode

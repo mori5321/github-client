@@ -14,9 +14,9 @@ module GitHub.Types.Issue
     )
 where
 
+import GHC.Generics
 import Data.Aeson (FromJSON, ToJSON)
 import qualified Data.Text as T
-import GHC.Generics
 import qualified Data.ByteString.Char8 as S8
 import Data.List
 import Data.Time

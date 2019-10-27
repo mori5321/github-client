@@ -7,17 +7,15 @@ module GitHub.Requests.User.Issues.List
   )
 where
 
-import qualified Data.Text as T
-import qualified Data.ByteString.Char8 as S8
-import Data.Aeson ( Value, FromJSON, ToJSON )
 import GHC.Generics
+import qualified Data.ByteString.Char8 as S8
+import qualified Network.HTTP.Simple as HTTP
+
 import GitHub.Types.User ( User(..) )
 import GitHub.Types.Issue ( Issue(..) )
 import GitHub.Query ( toHTTPQueryItem, QueryItem )
-import GitHub.Request ( IsRequest(..)
-                      , Request(..)
+import GitHub.Request ( Request(..)
                       , Method(..)
-                      , Path
                       , getResponseBody
                       , sendRequest
                       , getResponseStatusCode
@@ -26,7 +24,6 @@ import GitHub.Request ( IsRequest(..)
                       , withBody
                       , withQuery
                       )
-import qualified Network.HTTP.Simple as HTTP
 import GitHub.Auth ( Auth )
 
     

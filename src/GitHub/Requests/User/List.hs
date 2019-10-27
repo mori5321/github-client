@@ -3,15 +3,14 @@
 
 module GitHub.Requests.User.List where
 
-import Data.Text as T
-import qualified Data.ByteString.Char8 as S8
-import Data.Aeson ( Value, FromJSON, ToJSON )
 import GHC.Generics
+import qualified Data.ByteString.Char8 as S8
+import qualified Network.HTTP.Simple as HTTP
+
+
 import GitHub.Types.User ( User(..) )
-import GitHub.Request ( IsRequest(..)
-                      , Request(..)
+import GitHub.Request ( Request(..)
                       , Method(..)
-                      , Path
                       , getResponseBody
                       , sendRequest
                       , getResponseStatusCode
@@ -19,15 +18,7 @@ import GitHub.Request ( IsRequest(..)
                       , withAuth
                       , withBody
                       )
-import qualified Network.HTTP.Simple as HTTP
 import GitHub.Auth ( Auth )
-
--- data ReqBody = ReqBody deriving (Show, Generic, ToJSON, FromJSON)
--- listUsersHttpRequest' :: Since -> Auth -> HTTP.Request
--- listUsersHttpRequest' since auth　= withAuth auth . withBody body . mkHttpRequest $ req
---   where
---     req = mkRequest since
---     body = ReqBody
 
 
 type Since = Integer
