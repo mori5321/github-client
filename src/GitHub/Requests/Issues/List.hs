@@ -8,8 +8,6 @@ module GitHub.Requests.Issues.List
   , listUserIssuesHttpRequest
   , listOrganizationIssues
   , listOrganizationIssuesHttpRequest
-  , getIssue
-  , getIssueHttpRequest
   )
 where
 
@@ -94,30 +92,3 @@ listOrganizationIssues name queryItems auth =
     getResponseBodyEither <$> sendRequest' httpReq
   where
     httpReq = listUserIssuesHttpRequest queryItems auth
-
-
-type OwnerName = S8.ByteString
-type RepoName = S8.ByteString
-type IssueNumber = Int
-
-getIssueHttpRequest :: OwnerName ->
-                       RepoName ->
-                       IssueNumber ->
-                       Auth ->
-                       HTTP.Request
-getIssueHttpRequest ownerName repoName issueNumber auth =
-    withAuth auth . mkHttpRequest $ req
-  where
-    req = Request { reqPath = S8.intercalate "/" ["repos", ownerName, repoName, "issues", S8.pack . show $ issueNumber]
-                  , reqMethod = GET
-                  }
-
-getIssue :: OwnerName ->
-            RepoName ->
-            IssueNumber ->
-            Auth ->
-            IO (Either Error Issue)
-getIssue ownerName repoName issueNumber auth =
-    getResponseBodyEither <$> sendRequest' httpReq
-  where
-    httpReq = getIssueHttpRequest ownerName repoName issueNumber auth

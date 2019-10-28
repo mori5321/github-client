@@ -10,7 +10,6 @@ import GHC.Generics
 import qualified Data.ByteString.Char8 as S8
 import qualified Network.HTTP.Simple as HTTP
 
-
 import GitHub.Types.User ( User(..) )
 import GitHub.Request ( Request(..)
                       , Method(..)
