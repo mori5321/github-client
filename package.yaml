@@ -29,12 +29,11 @@ dependencies:
 - yaml
 - http-client-tls
 - mtl
-- text
 - ghc-prim
 - time
 - iso8601-time
 - containers
-
+- text
 
 
 

@@ -16,10 +16,10 @@ import GitHub.Query ( IsHTTPQueryItem(..), QueryItem )
 
 data User = User { id :: Integer
                  , login :: T.Text
+                 , avatar_url :: T.Text
                  } deriving (Show, Generic)
 instance FromJSON User
 instance ToJSON User
-
 
 newtype Since = Since Int deriving Show
 instance IsHTTPQueryItem Since where

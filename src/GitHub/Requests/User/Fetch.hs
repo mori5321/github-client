@@ -3,6 +3,7 @@
 
 module GitHub.Requests.User.Fetch
   ( fetchUser
+  , fetchUserHttpRequest
   )
 where
 

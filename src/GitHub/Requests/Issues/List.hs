@@ -1,8 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module GitHub.Requests.User.Issues.List
+module GitHub.Requests.Issues.List
   ( listUserIssues
+  , listUserIssuesHttpRequest
   )
 where
 
@@ -27,17 +28,13 @@ import GitHub.Request ( Request(..)
 import GitHub.Auth ( Auth )
 
     
-mkRequest :: Request
-mkRequest = Request { reqPath =  mconcat ["user", "/issues"]
-                    , reqMethod = GET
-                    }
-
 listUserIssuesHttpRequest :: [QueryItem] -> Auth -> HTTP.Request
 listUserIssuesHttpRequest queryItems auth = withAuth auth
                                            . withQuery query
                                            . mkHttpRequest $ req
   where
-    req = mkRequest
+    req = Request { reqPath =  mconcat ["user", "/issues"]
+                  , reqMethod = GET }
     query = map toHTTPQueryItem queryItems
 
 
