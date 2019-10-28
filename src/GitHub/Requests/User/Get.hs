@@ -1,9 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module GitHub.Requests.User.Fetch
-  ( fetchUser
-  , fetchUserHttpRequest
+module GitHub.Requests.User.Get
+  ( getUser
+  , getUserHttpRequest
   )
 where
 
@@ -33,14 +33,14 @@ type UserName = S8.ByteString
 mkRequest :: UserName -> Request
 mkRequest userName = Request ("/users/" <> userName) GET
 
-fetchUserHttpRequest :: UserName -> Auth -> HTTP.Request
-fetchUserHttpRequest name auth = withAuth auth
+getUserHttpRequest :: UserName -> Auth -> HTTP.Request
+getUserHttpRequest name auth = withAuth auth
                                  . mkHttpRequest $ req
   where
     req = mkRequest name
 
-fetchUser :: UserName -> Auth -> IO (Either Error User)
-fetchUser name auth =
+getUser :: UserName -> Auth -> IO (Either Error User)
+getUser name auth =
     getResponseBodyEither <$> sendRequest' httpReq
   where
-    httpReq = fetchUserHttpRequest name auth
+    httpReq = getUserHttpRequest name auth

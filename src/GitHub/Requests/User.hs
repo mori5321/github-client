@@ -2,11 +2,11 @@
 
 module GitHub.Requests.User
     ( listUserIssues
-    , fetchUser
+    , getUser
     , listUsers
     )
 where
 
-import GitHub.Requests.User.Fetch (fetchUser)
+import GitHub.Requests.User.Get (getUser)
 import GitHub.Requests.User.List (listUsers)
 import GitHub.Requests.Issues.List (listUserIssues)
