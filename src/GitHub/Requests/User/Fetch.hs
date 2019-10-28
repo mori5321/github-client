@@ -40,8 +40,7 @@ fetchUserHttpRequest name auth = withAuth auth
     req = mkRequest name
 
 fetchUser :: UserName -> Auth -> IO (Either Error User)
-fetchUser name auth = do
-    -- parseBodyEither . getResponseBody <$> sendRequest' httpReq
+fetchUser name auth =
     getResponseBodyEither <$> sendRequest' httpReq
   where
     httpReq = fetchUserHttpRequest name auth
