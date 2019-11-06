@@ -7,7 +7,7 @@ module GitHub.Requests.User.List
 where
 
 import GHC.Generics
-import qualified Data.ByteString.Char8 as S8
+import qualified Data.Text as T
 import qualified Network.HTTP.Simple as HTTP
 
 import GitHub.Types.User ( User(..) )

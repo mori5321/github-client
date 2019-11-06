@@ -16,8 +16,8 @@ where
 
 import GHC.Generics
 import Data.Aeson (FromJSON, ToJSON)
-import qualified Data.Text as T
 import qualified Data.ByteString.Char8 as S8
+import qualified Data.Text as T
 import Data.List
 import Data.Time
 import Data.Time.ISO8601
@@ -51,14 +51,15 @@ instance IsHTTPQueryItem StateQuery where
     toHTTPQueryItem Closed   = ("state", Just "closed")
     toHTTPQueryItem AllState = ("state", Just "all")
 
-newtype LabelQuery = LabelQuery S8.ByteString
+newtype LabelQuery = LabelQuery T.Text
 type LabelsQuery = [LabelQuery]
 
-unwrapLabelQuery :: LabelQuery -> S8.ByteString
+unwrapLabelQuery :: LabelQuery -> T.Text
 unwrapLabelQuery (LabelQuery bs) = bs
 
 instance IsHTTPQueryItem LabelsQuery where
-    toHTTPQueryItem labels = ("labels", Just $ S8.intercalate "," $ map unwrapLabelQuery labels)
+    toHTTPQueryItem labels = ("labels", Just $ S8.pack $ T.unpack $ T.intercalate "," $ map unwrapLabelQuery labels)
+    -- TODO: 文字周りはどこかで整理したい
 
 data SortQuery = SortByCreated | SortByUpdated | SortByComments
 instance IsHTTPQueryItem SortQuery where

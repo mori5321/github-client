@@ -26,7 +26,9 @@ where
 
 import GHC.Generics
 import Data.Aeson ( Value, FromJSON, ToJSON )
+import qualified Data.Text as T
 import qualified Data.ByteString.Char8 as S8
+
 import Network.HTTP.Simple ( setRequestPath
                            , setRequestHost
                            , setRequestHeader
@@ -50,7 +52,7 @@ import GitHub.Auth ( setRequestAuth, Auth(..) )
 
 data Method = GET | POST | PATCH | DELETE deriving Show
 
-type Path = S8.ByteString
+type Path = T.Text
 
 data Request = Request { reqPath :: Path
                        , reqMethod :: Method
@@ -80,7 +82,7 @@ withQuery = setRequestQueryString
 
 mkHttpRequestDefault :: IsRequest r => r -> HTTP.Request
 mkHttpRequestDefault req = 
-    setRequestPath (path req)
+    setRequestPath (S8.pack (T.unpack (path req)))
         $ setRequestMethod (S8.pack . show $ method req)
         $ setDefaultHeaders
         $ setDefaultConfigs

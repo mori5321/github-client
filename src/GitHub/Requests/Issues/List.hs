@@ -12,7 +12,7 @@ module GitHub.Requests.Issues.List
 where
 
 import GHC.Generics
-import qualified Data.ByteString.Char8 as S8
+import qualified Data.Text as T
 import qualified Network.HTTP.Simple as HTTP
 
 import GitHub.Types.User ( User(..) )
@@ -70,7 +70,7 @@ listUserIssues queryItems auth =
 
 
 
-type OrganizationName = S8.ByteString
+type OrganizationName = T.Text
 
 listOrganizationIssuesHttpRequest :: OrganizationName ->
                                      [QueryItem] ->
@@ -79,7 +79,7 @@ listOrganizationIssuesHttpRequest :: OrganizationName ->
 listOrganizationIssuesHttpRequest name queryItems auth =
     withAuth auth . withQuery query . mkHttpRequest $ req
   where
-    req = Request { reqPath = S8.intercalate "/" ["orgs", name, "issues"]
+    req = Request { reqPath = T.intercalate "/" ["orgs", name, "issues"]
                   , reqMethod = GET }
     query = map toHTTPQueryItem queryItems
 

@@ -8,7 +8,7 @@ module GitHub.Requests.Issues.Get
 where
 
 import GHC.Generics
-import qualified Data.ByteString.Char8 as S8
+import qualified Data.Text as T
 import qualified Network.HTTP.Simple as HTTP
 
 import GitHub.Types.User ( User(..) )
@@ -28,8 +28,8 @@ import GitHub.Request ( Request(..)
 import GitHub.Auth ( Auth )
 import GitHub.Error (Error, parseBodyEither, getResponseBodyEither)
 
-type OwnerName = S8.ByteString
-type RepoName = S8.ByteString
+type OwnerName = T.Text
+type RepoName = T.Text
 type IssueNumber = Int
 
 getIssueHttpRequest :: OwnerName ->
@@ -40,7 +40,7 @@ getIssueHttpRequest :: OwnerName ->
 getIssueHttpRequest ownerName repoName issueNumber auth =
     withAuth auth . mkHttpRequest $ req
   where
-    req = Request { reqPath = S8.intercalate "/" ["repos", ownerName, repoName, "issues", S8.pack . show $ issueNumber]
+    req = Request { reqPath = T.intercalate "/" ["repos", ownerName, repoName, "issues", T.pack . show $ issueNumber]
                   , reqMethod = GET
                   }
 

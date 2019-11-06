@@ -8,7 +8,7 @@ module GitHub.Requests.User.Get
 where
 
 import GHC.Generics
-import qualified Data.ByteString.Char8 as S8
+import qualified Data.Text as T
 
 import GitHub.Types.User ( User(..) )
 import GitHub.Request ( Request(..)
@@ -28,7 +28,7 @@ import Data.Aeson (Value, FromJSON, ToJSON)
 import GitHub.Error (Error, parseBodyEither, getResponseBodyEither)
 
 
-type UserName = S8.ByteString
+type UserName = T.Text
 
 mkRequest :: UserName -> Request
 mkRequest userName = Request ("/users/" <> userName) GET

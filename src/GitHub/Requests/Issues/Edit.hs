@@ -6,7 +6,7 @@
 module GitHub.Requests.Issues.Edit where
 
 import GHC.Generics
-import qualified Data.ByteString.Char8 as S8
+import qualified Data.Text as T
 import qualified Network.HTTP.Simple as HTTP
 import Data.Aeson (ToJSON, FromJSON)
 import qualified Data.Text as T
@@ -33,15 +33,15 @@ data ReqBody = ReqBody { title :: T.Text
                        , state :: T.Text -- この辺もうちょっと型で強くしたい
                        } deriving (Show, Generic, ToJSON, FromJSON)
 
-type OwnerName = S8.ByteString -- この辺もnewtypeとかでいい感じに汎化したい
-type RepoName = S8.ByteString
+type OwnerName = T.Text -- この辺もnewtypeとかでいい感じに汎化したい
+type RepoName = T.Text
 type IssueNumber = Int
 
 editIssueHttpRequest :: OwnerName -> RepoName -> IssueNumber -> ReqBody -> Auth -> HTTP.Request
 editIssueHttpRequest ownerName repoName issueNumber body auth =
     withAuth auth . withBody body . mkHttpRequest $ req
   where
-    req = Request { reqPath = S8.intercalate "/" ["repos", ownerName, repoName, "issues", S8.pack $ show issueNumber]
+    req = Request { reqPath = T.intercalate "/" ["repos", ownerName, repoName, "issues", T.pack $ show issueNumber]
                   , reqMethod = PATCH
                   }
 
