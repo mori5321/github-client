@@ -7,7 +7,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 
-module GitHub.Request 
+module GitHub.Request
     ( IsRequest(..)
     , IsHTTPQueryItem(..)
     , Method(..)
@@ -21,34 +21,43 @@ module GitHub.Request
     , withAuth
     , withQuery
     , withBody
+    , toPath
     )
 where
 
-import GHC.Generics
-import Data.Aeson ( Value, FromJSON, ToJSON )
-import qualified Data.Text as T
-import qualified Data.ByteString.Char8 as S8
+import           GHC.Generics
+import           Data.Aeson                     ( Value
+                                                , FromJSON
+                                                , ToJSON
+                                                )
+import qualified Data.Text                     as T
+import qualified Data.ByteString.Char8         as S8
 
-import Network.HTTP.Simple ( setRequestPath
-                           , setRequestHost
-                           , setRequestHeader
-                           , setRequestBodyJSON
-                           , setRequestMethod
-                           , setRequestPort
-                           , setRequestSecure
-                           , setRequestManager
-                           , setRequestQueryString
-                           , defaultRequest
-                           , httpJSON
-                           , httpJSONEither
-                           , JSONException
-                           , getResponseStatusCode
-                           , getResponseHeader
-                           , getResponseBody
-                           )
-import qualified Network.HTTP.Simple as HTTP
+import           Network.HTTP.Simple            ( setRequestPath
+                                                , setRequestHost
+                                                , setRequestHeader
+                                                , setRequestBodyJSON
+                                                , setRequestMethod
+                                                , setRequestPort
+                                                , setRequestSecure
+                                                , setRequestManager
+                                                , setRequestQueryString
+                                                , defaultRequest
+                                                , httpJSON
+                                                , httpJSONEither
+                                                , JSONException
+                                                , getResponseStatusCode
+                                                , getResponseHeader
+                                                , getResponseBody
+                                                )
+import qualified Network.HTTP.Simple           as HTTP
 
-import GitHub.Auth ( setRequestAuth, Auth(..) )
+import           GitHub.Types.Name              ( untagName
+                                                , Name
+                                                )
+import           GitHub.Auth                    ( setRequestAuth
+                                                , Auth(..)
+                                                )
 
 data Method = GET | POST | PATCH | DELETE deriving Show
 
@@ -68,9 +77,9 @@ class IsRequest request where
     mkHttpRequest = mkHttpRequestDefault
 
 instance IsRequest Request where
-    path = reqPath
+    path   = reqPath
     method = reqMethod
-    
+
 withAuth :: Auth -> HTTP.Request -> HTTP.Request
 withAuth = setRequestAuth
 
@@ -81,7 +90,7 @@ withQuery :: HTTP.Query -> HTTP.Request -> HTTP.Request
 withQuery = setRequestQueryString
 
 mkHttpRequestDefault :: IsRequest r => r -> HTTP.Request
-mkHttpRequestDefault req = 
+mkHttpRequestDefault req =
     setRequestPath (S8.pack (T.unpack (path req)))
         $ setRequestMethod (S8.pack . show $ method req)
         $ setDefaultHeaders
@@ -102,18 +111,27 @@ mkHttpRequestDefault req =
 
 
 setDefaultHeaders :: HTTP.Request -> HTTP.Request
-setDefaultHeaders = 
+setDefaultHeaders =
     setRequestHeader "Content-Type" ["application/json"]
-    . setRequestHeader "User-Agent" ["Github-API-Client"]
+        . setRequestHeader "User-Agent" ["Github-API-Client"]
 
 setDefaultConfigs :: HTTP.Request -> HTTP.Request
 setDefaultConfigs =
-    setRequestPort 443
-    . setRequestSecure True 
-    . setRequestHost "api.github.com"
+    setRequestPort 443 . setRequestSecure True . setRequestHost "api.github.com"
 
 sendRequest :: (FromJSON r) => HTTP.Request -> IO (HTTP.Response r)
 sendRequest = httpJSON
 
-sendRequest' :: (FromJSON r) => HTTP.Request -> IO (HTTP.Response (Either JSONException r))
+sendRequest'
+    :: (FromJSON r)
+    => HTTP.Request
+    -> IO (HTTP.Response (Either JSONException r))
 sendRequest' = httpJSONEither
+
+
+
+class IsPathPart a where
+    toPath :: a -> Path
+
+instance IsPathPart (Name a) where
+    toPath = untagName

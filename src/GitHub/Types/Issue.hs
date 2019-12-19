@@ -14,16 +14,20 @@ module GitHub.Types.Issue
     )
 where
 
-import GHC.Generics
-import Data.Aeson (FromJSON, ToJSON)
-import qualified Data.ByteString.Char8 as S8
-import qualified Data.Text as T
-import Data.List
-import Data.Time
-import Data.Time.ISO8601
+import           GHC.Generics
+import           Data.Aeson                     ( FromJSON
+                                                , ToJSON
+                                                )
+import qualified Data.ByteString.Char8         as S8
+import qualified Data.Text                     as T
+import           Data.List
+import           Data.Time
+import           Data.Time.ISO8601
 
-import GitHub.Query ( IsHTTPQueryItem(..), QueryItem )
-import GitHub.Types.User ( User )
+import           GitHub.Query                   ( IsHTTPQueryItem(..)
+                                                , QueryItem
+                                                )
+import           GitHub.Types.User              ( User )
 
 
 data Issue = Issue { id :: Integer
@@ -58,7 +62,12 @@ unwrapLabelQuery :: LabelQuery -> T.Text
 unwrapLabelQuery (LabelQuery bs) = bs
 
 instance IsHTTPQueryItem LabelsQuery where
-    toHTTPQueryItem labels = ("labels", Just $ S8.pack $ T.unpack $ T.intercalate "," $ map unwrapLabelQuery labels)
+    toHTTPQueryItem labels =
+        ( "labels"
+        , Just $ S8.pack $ T.unpack $ T.intercalate "," $ map
+            unwrapLabelQuery
+            labels
+        )
     -- TODO: 文字周りはどこかで整理したい
 
 data SortQuery = SortByCreated | SortByUpdated | SortByComments
@@ -70,7 +79,7 @@ instance IsHTTPQueryItem SortQuery where
 data DirectionQuery = Desc | Asc
 instance IsHTTPQueryItem DirectionQuery where
     toHTTPQueryItem Desc = ("direction", Just "desc")
-    toHTTPQueryItem Asc = ("direction", Just "asc")
+    toHTTPQueryItem Asc  = ("direction", Just "asc")
 
 type SinceQuery = UTCTime
 instance IsHTTPQueryItem SinceQuery where

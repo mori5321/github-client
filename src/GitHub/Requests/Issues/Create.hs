@@ -28,7 +28,6 @@ import GitHub.Query ( toHTTPQueryItem, QueryItem )
 import GitHub.Types.Issue (Issue)
 
 
-
 data ReqBody = ReqBody { title :: T.Text
                        , body :: T.Text
                        } deriving (Show, Generic, ToJSON, FromJSON)
