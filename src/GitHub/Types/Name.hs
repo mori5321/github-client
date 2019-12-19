@@ -14,8 +14,8 @@ import           Data.Aeson                     ( FromJSON
 newtype Name entity = N T.Text
     deriving (Eq, Ord, Show)
 
-mkName :: proxy entity -> T.Text -> Name entity
-mkName _ = N
+-- mkName :: proxy entity -> T.Text -> Name entity
+-- mkName _ = N
 
 untagName :: Name entity -> T.Text
 untagName (N name) = name

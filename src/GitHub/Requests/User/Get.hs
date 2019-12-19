@@ -7,25 +7,31 @@ module GitHub.Requests.User.Get
   )
 where
 
-import GHC.Generics
-import qualified Data.Text as T
+import           GHC.Generics
+import qualified Data.Text                     as T
 
-import GitHub.Types.User ( User(..) )
-import GitHub.Request ( Request(..)
-                      , Method(..)
-                      , Path
-                      , mkHttpRequest
-                      , getResponseBody
-                      , sendRequest
-                      , sendRequest'
-                      , getResponseStatusCode
-                      , withAuth
-                      , withBody
-                      )
-import qualified Network.HTTP.Simple as HTTP
-import GitHub.Auth (Auth)
-import Data.Aeson (Value, FromJSON, ToJSON) 
-import GitHub.Error (Error, parseBodyEither, getResponseBodyEither)
+import           GitHub.Types.User              ( User(..) )
+import           GitHub.Request                 ( Request(..)
+                                                , Method(..)
+                                                , Path
+                                                , mkHttpRequest
+                                                , getResponseBody
+                                                , sendRequest
+                                                , sendRequest'
+                                                , getResponseStatusCode
+                                                , withAuth
+                                                , withBody
+                                                )
+import qualified Network.HTTP.Simple           as HTTP
+import           GitHub.Auth                    ( Auth )
+import           Data.Aeson                     ( Value
+                                                , FromJSON
+                                                , ToJSON
+                                                )
+import           GitHub.Error                   ( Error
+                                                , parseBodyEither
+                                                , getResponseBodyEither
+                                                )
 
 
 type UserName = T.Text
@@ -34,13 +40,9 @@ mkRequest :: UserName -> Request
 mkRequest userName = Request ("/users/" <> userName) GET
 
 getUserHttpRequest :: UserName -> Auth -> HTTP.Request
-getUserHttpRequest name auth = withAuth auth
-                                 . mkHttpRequest $ req
-  where
-    req = mkRequest name
+getUserHttpRequest name auth = withAuth auth . mkHttpRequest $ req
+  where req = mkRequest name
 
 getUser :: UserName -> Auth -> IO (Either Error User)
-getUser name auth =
-    getResponseBodyEither <$> sendRequest' httpReq
-  where
-    httpReq = getUserHttpRequest name auth
+getUser name auth = getResponseBodyEither <$> sendRequest' httpReq
+  where httpReq = getUserHttpRequest name auth

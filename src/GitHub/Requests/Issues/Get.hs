@@ -33,17 +33,16 @@ import           GitHub.Error                   ( Error
                                                 , parseBodyEither
                                                 , getResponseBodyEither
                                                 )
-import           GitHub.Types.Name              ( mkName
-                                                , Name
-                                                )
+import           GitHub.Types.Name              ( Name )
 import           GitHub.Types.Owner             ( Owner )
+import           GitHub.Types.Repo              ( Repo )
 
 type OwnerName = T.Text
 type RepoName = T.Text
 type IssueNumber = Int
 
 getIssueHttpRequest
-  :: Name Owner -> RepoName -> IssueNumber -> Auth -> HTTP.Request
+  :: Name Owner -> Name Repo -> IssueNumber -> Auth -> HTTP.Request
 getIssueHttpRequest ownerName repoName issueNumber auth =
   withAuth auth . mkHttpRequest $ req
  where
@@ -52,7 +51,7 @@ getIssueHttpRequest ownerName repoName issueNumber auth =
                     "/"
                     [ "repos"
                     , toPath ownerName
-                    , repoName
+                    , toPath repoName
                     , "issues"
                     , T.pack . show $ issueNumber
                     ]
@@ -60,7 +59,7 @@ getIssueHttpRequest ownerName repoName issueNumber auth =
     }
 
 getIssue
-  :: Name Owner -> RepoName -> IssueNumber -> Auth -> IO (Either Error Issue)
+  :: Name Owner -> Name Repo -> IssueNumber -> Auth -> IO (Either Error Issue)
 getIssue ownerName repoName issueNumber auth = getResponseBodyEither
   <$> sendRequest' httpReq
   where httpReq = getIssueHttpRequest ownerName repoName issueNumber auth
