@@ -8,21 +8,21 @@
 
 
 module GitHub.Request
-    ( IsRequest(..)
-    , IsHTTPQueryItem(..)
-    , Method(..)
-    , Request(..)
-    , Path
-    , getResponseBody
-    , getResponseStatusCode
-    , sendRequest
-    , sendRequest'
-    , mkHttpRequestDefault
-    , withAuth
-    , withQuery
-    , withBody
-    , toPath
-    )
+        ( IsRequest(..)
+        , IsHTTPQueryItem(..)
+        , Method(..)
+        , Request(..)
+        , Path
+        , getResponseBody
+        , getResponseStatusCode
+        , sendRequest
+        , sendRequest'
+        , mkHttpRequestDefault
+        , withAuth
+        , withQuery
+        , withBody
+        , toPath
+        )
 where
 
 import           GHC.Generics
@@ -77,8 +77,8 @@ class IsRequest request where
     mkHttpRequest = mkHttpRequestDefault
 
 instance IsRequest Request where
-    path   = reqPath
-    method = reqMethod
+        path   = reqPath
+        method = reqMethod
 
 withAuth :: Auth -> HTTP.Request -> HTTP.Request
 withAuth = setRequestAuth
@@ -91,11 +91,11 @@ withQuery = setRequestQueryString
 
 mkHttpRequestDefault :: IsRequest r => r -> HTTP.Request
 mkHttpRequestDefault req =
-    setRequestPath (S8.pack (T.unpack (path req)))
-        $ setRequestMethod (S8.pack . show $ method req)
-        $ setDefaultHeaders
-        $ setDefaultConfigs
-        $ defaultRequest
+        setRequestPath (S8.pack (T.unpack (path req)))
+                $ setRequestMethod (S8.pack . show $ method req)
+                $ setDefaultHeaders
+                $ setDefaultConfigs
+                $ defaultRequest
 
 -- execRequest :: (FromJSON b) => HTTP.Request -> IO b
 -- execRequest req = getResponseBody <$> sendRequest req
@@ -112,20 +112,20 @@ mkHttpRequestDefault req =
 
 setDefaultHeaders :: HTTP.Request -> HTTP.Request
 setDefaultHeaders =
-    setRequestHeader "Content-Type" ["application/json"]
-        . setRequestHeader "User-Agent" ["Github-API-Client"]
+        setRequestHeader "Content-Type" ["application/json"]
+                . setRequestHeader "User-Agent" ["Github-API-Client"]
 
 setDefaultConfigs :: HTTP.Request -> HTTP.Request
-setDefaultConfigs =
-    setRequestPort 443 . setRequestSecure True . setRequestHost "api.github.com"
+setDefaultConfigs = setRequestPort 443 . setRequestSecure True . setRequestHost
+        "api.github.com"
 
 sendRequest :: (FromJSON r) => HTTP.Request -> IO (HTTP.Response r)
 sendRequest = httpJSON
 
 sendRequest'
-    :: (FromJSON r)
-    => HTTP.Request
-    -> IO (HTTP.Response (Either JSONException r))
+        :: (FromJSON r)
+        => HTTP.Request
+        -> IO (HTTP.Response (Either JSONException r))
 sendRequest' = httpJSONEither
 
 
@@ -134,4 +134,4 @@ class IsPathPart a where
     toPath :: a -> Path
 
 instance IsPathPart (Name a) where
-    toPath = untagName
+        toPath = untagName

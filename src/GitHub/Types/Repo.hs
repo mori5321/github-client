@@ -2,8 +2,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module GitHub.Types.Repo
-    ( Repo(..)
-    )
+        ( Repo(..)
+        )
 where
 
 import           Data.Aeson                     ( FromJSON

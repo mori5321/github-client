@@ -2,9 +2,9 @@
 {-# LANGUAGE TypeFamilies #-}
 
 module GitHub.Requests.Issues.Get
-  ( getIssue
-  , getIssueHttpRequest
-  )
+        ( getIssue
+        , getIssueHttpRequest
+        )
 where
 
 import           GHC.Generics
@@ -42,24 +42,28 @@ type RepoName = T.Text
 type IssueNumber = Int
 
 getIssueHttpRequest
-  :: Name Owner -> Name Repo -> IssueNumber -> Auth -> HTTP.Request
+        :: Name Owner -> Name Repo -> IssueNumber -> Auth -> HTTP.Request
 getIssueHttpRequest ownerName repoName issueNumber auth =
-  withAuth auth . mkHttpRequest $ req
- where
-  req = Request
-    { reqPath   = T.intercalate
-                    "/"
-                    [ "repos"
-                    , toPath ownerName
-                    , toPath repoName
-                    , "issues"
-                    , T.pack . show $ issueNumber
-                    ]
-    , reqMethod = GET
-    }
+        withAuth auth . mkHttpRequest $ req
+    where
+        req = Request
+                { reqPath   = T.intercalate
+                                      "/"
+                                      [ "repos"
+                                      , toPath ownerName
+                                      , toPath repoName
+                                      , "issues"
+                                      , T.pack . show $ issueNumber
+                                      ]
+                , reqMethod = GET
+                }
 
 getIssue
-  :: Name Owner -> Name Repo -> IssueNumber -> Auth -> IO (Either Error Issue)
+        :: Name Owner
+        -> Name Repo
+        -> IssueNumber
+        -> Auth
+        -> IO (Either Error Issue)
 getIssue ownerName repoName issueNumber auth = getResponseBodyEither
-  <$> sendRequest' httpReq
-  where httpReq = getIssueHttpRequest ownerName repoName issueNumber auth
+        <$> sendRequest' httpReq
+        where httpReq = getIssueHttpRequest ownerName repoName issueNumber auth

@@ -1,12 +1,12 @@
 {-# LANGUAGE ExistentialQuantification #-}
 
 module GitHub.Query
-    ( IsHTTPQueryItem(..)
-    , QueryItem(..)
-    )
+        ( IsHTTPQueryItem(..)
+        , QueryItem(..)
+        )
 where
 
-import qualified Network.HTTP.Simple as HTTP
+import qualified Network.HTTP.Simple           as HTTP
 
 class IsHTTPQueryItem a where
     toHTTPQueryItem :: a -> HTTP.QueryItem
@@ -20,4 +20,4 @@ class IsHTTPQueryItem a where
 -- listUserIssues query auth
 data QueryItem = forall a . IsHTTPQueryItem a => QueryItem a
 instance IsHTTPQueryItem QueryItem where
-    toHTTPQueryItem (QueryItem qi) = toHTTPQueryItem qi
+        toHTTPQueryItem (QueryItem qi) = toHTTPQueryItem qi

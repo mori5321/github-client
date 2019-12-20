@@ -2,93 +2,88 @@
 {-# LANGUAGE TypeFamilies #-}
 
 module GitHub.Requests.Issues.List
-  ( listIssues
-  , listIssuesHttpRequest
-  , listUserIssues
-  , listUserIssuesHttpRequest
-  , listOrganizationIssues
-  , listOrganizationIssuesHttpRequest
-  )
+        ( listIssues
+        , listIssuesHttpRequest
+        , listUserIssues
+        , listUserIssuesHttpRequest
+        , listOrganizationIssues
+        , listOrganizationIssuesHttpRequest
+        )
 where
 
-import GHC.Generics
-import qualified Data.Text as T
-import qualified Network.HTTP.Simple as HTTP
+import           GHC.Generics
+import qualified Data.Text                     as T
+import qualified Network.HTTP.Simple           as HTTP
 
-import GitHub.Types.User ( User(..) )
-import GitHub.Types.Issue ( Issue(..) )
-import GitHub.Query ( toHTTPQueryItem, QueryItem )
-import GitHub.Request ( Request(..)
-                      , Method(..)
-                      , getResponseBody
-                      , sendRequest
-                      , sendRequest'
-                      , getResponseStatusCode
-                      , mkHttpRequest
-                      , withAuth
-                      , withBody
-                      , withQuery
-                      )
-import GitHub.Auth ( Auth )
-import GitHub.Error (Error, parseBodyEither, getResponseBodyEither)
+import           GitHub.Types.User              ( User(..) )
+import           GitHub.Types.Issue             ( Issue(..) )
+import           GitHub.Query                   ( toHTTPQueryItem
+                                                , QueryItem
+                                                )
+import           GitHub.Request                 ( Request(..)
+                                                , Method(..)
+                                                , getResponseBody
+                                                , sendRequest
+                                                , sendRequest'
+                                                , getResponseStatusCode
+                                                , mkHttpRequest
+                                                , withAuth
+                                                , withBody
+                                                , withQuery
+                                                )
+import           GitHub.Auth                    ( Auth )
+import           GitHub.Error                   ( Error
+                                                , parseBodyEither
+                                                , getResponseBodyEither
+                                                )
 
 listIssuesHttpRequest :: [QueryItem] -> Auth -> HTTP.Request
-listIssuesHttpRequest queryItems auth = withAuth auth
-                                        . withQuery query
-                                        . mkHttpRequest $ req
-  where
-    req = Request { reqPath = mconcat ["/issues"]
-                  , reqMethod = GET }
-    query = map toHTTPQueryItem queryItems
+listIssuesHttpRequest queryItems auth =
+        withAuth auth . withQuery query . mkHttpRequest $ req
+    where
+        req   = Request { reqPath = mconcat ["/issues"], reqMethod = GET }
+        query = map toHTTPQueryItem queryItems
 
-                             
+
 listIssues :: [QueryItem] -> Auth -> IO (Either Error [Issue])
-listIssues queryItems auth =
-    getResponseBodyEither <$> sendRequest' httpReq
-   where
-    httpReq = listIssuesHttpRequest queryItems auth
+listIssues queryItems auth = getResponseBodyEither <$> sendRequest' httpReq
+        where httpReq = listIssuesHttpRequest queryItems auth
 
 
 
 listUserIssuesHttpRequest :: [QueryItem] -> Auth -> HTTP.Request
-listUserIssuesHttpRequest queryItems auth = withAuth auth
-                                           . withQuery query
-                                           . mkHttpRequest $ req
-  where
-    req = Request { reqPath =  mconcat ["user", "/issues"]
-                  , reqMethod = GET }
-    query = map toHTTPQueryItem queryItems
+listUserIssuesHttpRequest queryItems auth =
+        withAuth auth . withQuery query . mkHttpRequest $ req
+    where
+        req = Request { reqPath   = mconcat ["user", "/issues"]
+                      , reqMethod = GET
+                      }
+        query = map toHTTPQueryItem queryItems
 
 -- # Usage
 -- Right res <- listUserIssues [QueryItem Created] auth
 -- mapM_ Data.Text.IO.putStrLn $ map GitHub.Types.Issue.title res
 listUserIssues :: [QueryItem] -> Auth -> IO (Either Error [Issue])
-listUserIssues queryItems auth =
-    getResponseBodyEither <$> sendRequest' httpReq
-  where
-    httpReq = listUserIssuesHttpRequest queryItems auth
+listUserIssues queryItems auth = getResponseBodyEither <$> sendRequest' httpReq
+        where httpReq = listUserIssuesHttpRequest queryItems auth
 
 
 
 type OrganizationName = T.Text
 
-listOrganizationIssuesHttpRequest :: OrganizationName ->
-                                     [QueryItem] ->
-                                     Auth ->
-                                     HTTP.Request
+listOrganizationIssuesHttpRequest
+        :: OrganizationName -> [QueryItem] -> Auth -> HTTP.Request
 listOrganizationIssuesHttpRequest name queryItems auth =
-    withAuth auth . withQuery query . mkHttpRequest $ req
-  where
-    req = Request { reqPath = T.intercalate "/" ["orgs", name, "issues"]
-                  , reqMethod = GET }
-    query = map toHTTPQueryItem queryItems
+        withAuth auth . withQuery query . mkHttpRequest $ req
+    where
+        req = Request { reqPath   = T.intercalate "/" ["orgs", name, "issues"]
+                      , reqMethod = GET
+                      }
+        query = map toHTTPQueryItem queryItems
 
 
-listOrganizationIssues :: OrganizationName ->
-                          [QueryItem] ->
-                          Auth ->
-                          IO (Either Error [Issue])
-listOrganizationIssues name queryItems auth =
-    getResponseBodyEither <$> sendRequest' httpReq
-  where
-    httpReq = listUserIssuesHttpRequest queryItems auth
+listOrganizationIssues
+        :: OrganizationName -> [QueryItem] -> Auth -> IO (Either Error [Issue])
+listOrganizationIssues name queryItems auth = getResponseBodyEither
+        <$> sendRequest' httpReq
+        where httpReq = listUserIssuesHttpRequest queryItems auth

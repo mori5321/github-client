@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module GitHub.Types.Owner
-    ( Owner
-    )
+        ( Owner
+        )
 where
 
 import           GHC.Generics                   ( Generic )

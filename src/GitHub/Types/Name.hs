@@ -21,7 +21,7 @@ untagName :: Name entity -> T.Text
 untagName (N name) = name
 
 instance FromJSON (Name entity) where
-    parseJSON = fmap N . parseJSON
+        parseJSON = fmap N . parseJSON
 
 instance IsString (Name entity) where
-    fromString = N . fromString
+        fromString = N . fromString

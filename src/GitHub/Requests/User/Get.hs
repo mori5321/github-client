@@ -2,9 +2,9 @@
 {-# LANGUAGE TypeFamilies #-}
 
 module GitHub.Requests.User.Get
-  ( getUser
-  , getUserHttpRequest
-  )
+        ( getUser
+        , getUserHttpRequest
+        )
 where
 
 import           GHC.Generics
@@ -41,8 +41,8 @@ mkRequest userName = Request ("/users/" <> userName) GET
 
 getUserHttpRequest :: UserName -> Auth -> HTTP.Request
 getUserHttpRequest name auth = withAuth auth . mkHttpRequest $ req
-  where req = mkRequest name
+        where req = mkRequest name
 
 getUser :: UserName -> Auth -> IO (Either Error User)
 getUser name auth = getResponseBodyEither <$> sendRequest' httpReq
-  where httpReq = getUserHttpRequest name auth
+        where httpReq = getUserHttpRequest name auth
