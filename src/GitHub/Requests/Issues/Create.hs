@@ -45,23 +45,19 @@ type OwnerName = T.Text
 type RepoName = T.Text
 
 createIssueHttpRequest
-        :: Name Owner -> Name Repo -> ReqBody -> Auth -> HTTP.Request
+    :: Name Owner -> Name Repo -> ReqBody -> Auth -> HTTP.Request
 createIssueHttpRequest ownerName repoName body auth =
-        withAuth auth . withBody body . mkHttpRequest $ req
-    where
-        req = Request
-                { reqPath   = T.intercalate
-                                      "/"
-                                      [ "repos"
-                                      , toPath ownerName
-                                      , toPath repoName
-                                      , "issues"
-                                      ]
-                , reqMethod = POST
-                }
+    withAuth auth . withBody body . mkHttpRequest $ req
+  where
+    req = Request
+        { reqPath   = T.intercalate
+                          "/"
+                          ["repos", toPath ownerName, toPath repoName, "issues"]
+        , reqMethod = POST
+        }
 
 createIssue
-        :: Name Owner -> Name Repo -> ReqBody -> Auth -> IO (Either Error Issue)
+    :: Name Owner -> Name Repo -> ReqBody -> Auth -> IO (Either Error Issue)
 createIssue ownerName repoName body auth = getResponseBodyEither
-        <$> sendRequest' httpReq
-        where httpReq = createIssueHttpRequest ownerName repoName body auth
+    <$> sendRequest' httpReq
+    where httpReq = createIssueHttpRequest ownerName repoName body auth
